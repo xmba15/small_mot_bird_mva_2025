@@ -1,0 +1,5 @@
+--find-links https://download.openmmlab.com/mmcv/dist/cu118/torch2.3/index.html
+openmim==0.3.9
+mmcv<2.2.0
+mmdet==v3.3.0
+mmpretrain==v1.2.0

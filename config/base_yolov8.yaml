@@ -1,0 +1,26 @@
+seed: 2025
+
+num_workers: 4
+experiment_name: "mmyolo_yolov8"
+
+dataset:
+  n_splits: 5
+  fold_th: 0
+
+model:
+  mm_config_path: ./config/base_yolov8.py
+  num_classes: 1
+  checkpoints: ./checkpoints/yolov8_l_mask-refine_syncbn_fast_8xb16-500e_coco_20230217_120100-5881dec4.pth
+
+trainer:
+  devices: [0]
+  max_epochs: 100
+
+train_parameters:
+  batch_size: &batch_size 8
+
+val_parameters:
+  batch_size: *batch_size
+
+output_root_dir: experiments
+checkpoints_dir: checkpoints
