@@ -48,7 +48,7 @@ def process_sod4sb(
             _anno["annotations"][idx]["category_id"] = 1
 
         _anno = {k: _anno[k] for k in ("images", "annotations")}
-        _anno["categories"] = {"id": 1, "name": "bird"}
+        _anno["categories"] = [{"id": 1, "name": "bird"}]
 
         return _anno
 
@@ -178,7 +178,7 @@ def process_fbd(
     split_anno = {
         "images": images,
         "annotations": annotations,
-        "categories": {"id": 1, "name": "bird"},
+        "categories": [{"id": 1, "name": "bird"}],
     }
 
     return split_anno

@@ -1,11 +1,5 @@
-# 📝 lib name
+# 📝 Small Multi-Object Tracking for Spotting Birds (SMOT4SB) Challenge 2025
 ***
-
-## :tada: TODO
-***
-
-- [x] a
-- [ ] b
 
 ## 🎛  Dependencies
 ***
