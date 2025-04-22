@@ -21,8 +21,28 @@ cd mmyolo
 mim install -v -e .
 ```
 
-## :running: How to Run ##
+## Download data ##
 ***
+
+- [FBD dataset](FBD-SV-2024: Flying Bird Object Detection Dataset in Surveillance Video)
+```
+# figshare link
+https://figshare.com/s/1ca0193680f894a65371?file=50113731
+
+# Repos:
+https://github.com/Ziwei89/FBD-SV-2024_github.git
+https://github.com/Ziwei89/FBOD
+
+# Command
+wget https://figshare.com/ndownloader/files/50113731?private_link=1ca0193680f894a65371 -O ./data/FBD-SV-2024.zip
+```
+
+- [SOD4SB](MVA2023 Small Object Detection Challenge for Spotting Birds: Dataset, Methods, and Results)
+```
+https://drive.google.com/drive/u/1/folders/1WnvpWi8C7GHu_OtXu8DHhDhrk3fCUliI
+
+gdown https://drive.google.com/drive/u/1/folders/1cPscYgFrBiuYqmN1U2QXyh4ewWiwxUXw -O  ./data/sod4sb --folder --continue --remaining-ok
+```
 
 ## :gem: References ##
 ***
