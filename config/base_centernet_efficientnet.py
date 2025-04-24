@@ -198,6 +198,69 @@ val_evaluator = dict(
     backend_args=None,
 )
 
+tta_model = dict(
+    tta_cfg=dict(max_per_img=200, nms=dict(iou_threshold=0.5, type="nms")),
+    type="DetTTAModel",
+)
+
+tta_pipeline = [
+    dict(backend_args=None, to_float32=True, type="LoadImageFromFile"),
+    dict(
+        transforms=[
+            [
+                dict(prob=1.0, type="RandomFlip"),
+                dict(prob=0.0, type="RandomFlip"),
+            ],
+            [
+                dict(
+                    border=None,
+                    mean=[
+                        0,
+                        0,
+                        0,
+                    ],
+                    ratios=None,
+                    std=[
+                        1,
+                        1,
+                        1,
+                    ],
+                    test_mode=True,
+                    test_pad_add_pix=1,
+                    test_pad_mode=[
+                        "logical_or",
+                        31,
+                    ],
+                    to_rgb=True,
+                    type="RandomCenterCropPad",
+                ),
+            ],
+            [
+                dict(type="LoadAnnotations", with_bbox=True),
+            ],
+            [
+                dict(
+                    meta_keys=(
+                        "img_id",
+                        "img_path",
+                        "ori_shape",
+                        "img_shape",
+                        "flip",
+                        "flip_direction",
+                        "scale_factor",
+                        "border",
+                    ),
+                    type="PackDetInputs",
+                ),
+            ],
+        ],
+        type="TestTimeAug",
+    ),
+]
+
+test_cfg = dict(type="TestLoop")
+test_dataloader = val_dataloader
+
 optim_wrapper = dict(
     clip_grad=dict(max_norm=35, norm_type=2),
     optimizer=dict(

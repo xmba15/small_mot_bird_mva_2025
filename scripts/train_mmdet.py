@@ -1,16 +1,10 @@
 import argparse
 import os
 
-import mmyolo
 import yaml
 from mmengine.config import Config
 from mmengine.registry import MODELS, build_from_cfg, init_default_scope
 from mmengine.runner import Runner, set_random_seed
-from mmyolo.utils import register_all_modules
-
-register_all_modules()
-
-init_default_scope("mmyolo")
 
 
 def get_args():
