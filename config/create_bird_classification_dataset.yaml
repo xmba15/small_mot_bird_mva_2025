@@ -1,0 +1,15 @@
+dataset:
+  train:
+    data_root: ./data/merged_dataset/train
+    annotation_json_path: ./data/merged_dataset/annotations/train.json
+    out_dir: ./data/bird_classification/train
+  val:
+    data_root: ./data/merged_dataset/val
+    annotation_json_path: ./data/merged_dataset/annotations/val.json
+    out_dir: ./data/bird_classification/val
+
+model:
+  mm_config_path: ./config/base_centernet_efficientnet.py
+  checkpoints:
+    - ./checkpoints/model_weights/centernet_efficientnet_merged_dataset_best_coco_bbox_mAP_epoch_31.pth
+    - ./checkpoints/model_weights/centernet_efficientnet_smot4sb_best_coco_bbox_mAP_epoch_17.pth

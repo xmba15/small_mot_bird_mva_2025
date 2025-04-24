@@ -17,10 +17,11 @@ __all__ = ("DetectorEnsembler",)
 
 class DetectorEnsembler:
     __DEFAULT_CONFIG = {
+        "conf_thr": 0.25,
         "wbf": {
             "iou_thr": 0.4,
             "conf_type": "max",
-        }
+        },
     }
 
     def __init__(
@@ -65,6 +66,14 @@ class DetectorEnsembler:
             **self.config["wbf"],
         )
         bboxes, scores, labels = results
+
+        valid_mask = scores >= self.config["conf_thr"]
+        bboxes = bboxes[valid_mask]
+        scores = scores[valid_mask]
+        labels = labels[valid_mask]
+
+        bboxes[:, 0] = bboxes[:, 0].clamp(min=0)
+        bboxes[:, 1] = bboxes[:, 1].clamp(min=0)
 
         pred_instances = InstanceData(
             bboxes=bboxes,
