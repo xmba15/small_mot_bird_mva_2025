@@ -90,3 +90,6 @@ GTAGS
 data/*
 mmdetection
 mmyolo
+experiments
+checkpoints
+outputs
