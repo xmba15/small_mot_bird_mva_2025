@@ -78,8 +78,9 @@ class DetectorEnsembler:
         )
         bboxes, scores, labels = results
 
-        bboxes[:, 0] = bboxes[:, 0].clamp(min=0)
-        bboxes[:, 1] = bboxes[:, 1].clamp(min=0)
+        if len(bboxes) > 0:
+            bboxes[:, 0] = bboxes[:, 0].clamp(min=0)
+            bboxes[:, 1] = bboxes[:, 1].clamp(min=0)
 
         return InstanceData(
             bboxes=bboxes,
