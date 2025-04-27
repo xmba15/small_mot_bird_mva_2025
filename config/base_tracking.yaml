@@ -1,0 +1,29 @@
+detector:
+  mm_config_paths:
+    - ./config/base_centernet_efficientnet.py
+    - ./config/base_centernet_efficientnet.py
+    - ./config/centernet_rexnet_150_merged_dataset.py
+  checkpoints:
+    - ./checkpoints/model_weights/centernet_efficientnet_merged_dataset_best_coco_bbox_mAP_epoch_31.pth
+    - ./checkpoints/model_weights/centernet_efficientnet_smot4sb_best_coco_bbox_mAP_epoch_17.pth
+    - ./checkpoints/model_weights/centernet_rexnet_150_merged_dataset_best_coco_bbox_mAP_epoch_36.pth
+  conf_thrs:
+    - 0.35
+    - 0.35
+    - 0.35
+
+classifier:
+  encoder_name: mambaout_tiny.in1k
+  checkpoint: ./checkpoints/model_weights/bird_classification_mambaout.pth
+  conf_thr: 0.5
+
+optical_flow:
+  model_name: "dip"
+  ckpt_path: "things"
+
+tracker:
+  tracker_type: ocsort
+  tracker_config_path: ./config/boxmot/ocsort.yaml
+  reid_weights: osnet_x0_25_msmt17.pt
+
+device: "cuda:0"

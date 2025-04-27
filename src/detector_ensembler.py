@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 import mmcv
 import torch
@@ -17,7 +17,6 @@ __all__ = ("DetectorEnsembler",)
 
 class DetectorEnsembler:
     __DEFAULT_CONFIG = {
-        "conf_thr": 0.25,
         "wbf": {
             "iou_thr": 0.4,
             "conf_type": "max",
@@ -26,28 +25,34 @@ class DetectorEnsembler:
 
     def __init__(
         self,
-        config_file: str,
-        checkpoint_files: str,
+        config_files: List[str],
+        checkpoint_files: List[str],
+        conf_thrs: List[float],
         device: str,
-        opt_config: str | None = None,
+        opt_config: Dict[str, Any] | None = None,
     ):
         self.config = self.__DEFAULT_CONFIG.copy()
         if opt_config is not None:
             self.config.update(opt_config)
 
-        cfg = Config.fromfile(config_file)
-        cfg.model = ConfigDict(**cfg.tta_model, module=cfg.model)
-        cfg.test_dataloader.dataset.pipeline = cfg.tta_pipeline
+        def load_cfg(config_file):
+            cfg = Config.fromfile(config_file)
+            cfg.model = ConfigDict(**cfg.tta_model, module=cfg.model)
+            cfg.test_dataloader.dataset.pipeline = cfg.tta_pipeline
 
+            return cfg
+
+        assert len(conf_thrs) == len(checkpoint_files)
         self.models = [
             init_detector(
-                cfg,
+                load_cfg(config_file),
                 checkpoint_file,
                 device=device,
                 cfg_options={},
             )
-            for checkpoint_file in checkpoint_files
+            for config_file, checkpoint_file in zip(config_files, checkpoint_files)
         ]
+        self.conf_thrs = conf_thrs
 
     @torch.no_grad()
     def inference(self, image_path: str):
@@ -55,37 +60,56 @@ class DetectorEnsembler:
             inference_detector(
                 model,
                 image_path,
-            )
+            ).pred_instances
             for model in self.models
         ]
 
+        for idx, result in enumerate(results):
+            results[idx] = self.filter_detections_by_confidence(
+                result,
+                self.conf_thrs[idx],
+            )
+
         results = weighted_boxes_fusion(
-            bboxes_list=[result.pred_instances.bboxes for result in results],
-            scores_list=[result.pred_instances.scores for result in results],
-            labels_list=[result.pred_instances.labels for result in results],
+            bboxes_list=[result.bboxes for result in results],
+            scores_list=[result.scores for result in results],
+            labels_list=[result.labels for result in results],
             **self.config["wbf"],
         )
         bboxes, scores, labels = results
 
-        valid_mask = scores >= self.config["conf_thr"]
-        bboxes = bboxes[valid_mask]
-        scores = scores[valid_mask]
-        labels = labels[valid_mask]
-
         bboxes[:, 0] = bboxes[:, 0].clamp(min=0)
         bboxes[:, 1] = bboxes[:, 1].clamp(min=0)
 
-        pred_instances = InstanceData(
+        return InstanceData(
             bboxes=bboxes,
             labels=labels,
             scores=scores,
         )
 
-        return DetDataSample(pred_instances=pred_instances)
+    def filter_detections_by_confidence(
+        self,
+        detections: InstanceData,
+        conf_thr: float,
+    ) -> InstanceData:
+        bboxes = detections.bboxes
+        scores = detections.scores
+        labels = detections.labels
+
+        valid_mask = scores >= conf_thr
+        bboxes = bboxes[valid_mask]
+        scores = scores[valid_mask]
+        labels = labels[valid_mask]
+
+        return InstanceData(
+            bboxes=bboxes,
+            labels=labels,
+            scores=scores,
+        )
 
     def add_datasample(
         self,
-        result: DetDataSample,
+        detections: InstanceData,
         image_path: str,
         pred_score_thr: float = 0.2,
         dataset_meta: Dict[str, Any] | None = None,
@@ -96,9 +120,9 @@ class DetectorEnsembler:
             visualizer.dataset_meta = dataset_meta
 
         visualizer.add_datasample(
-            name="result",
+            name="detections",
             image=mmcv.imread(image_path, channel_order="rgb"),
-            data_sample=result,
+            data_sample=DetDataSample(pred_instances=detections),
             show=False,
             pred_score_thr=pred_score_thr,
             out_file=output_path,

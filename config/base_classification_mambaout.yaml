@@ -1,0 +1,49 @@
+seed: 2025
+
+num_workers: 4
+experiment_name: "bird_classification_mambaout"
+
+dataset:
+  data_root: ./data/bird_classification
+
+model:
+  encoder_name: mambaout_tiny.in1k
+  pretrained: true
+  pl_class: src.integrated.BaseClassificationModelPl
+
+max_epochs: &max_epochs 20
+
+trainer:
+  devices: [1]
+  accelerator: "cuda"
+  max_epochs: *max_epochs
+  gradient_clip_val: 5.0
+  accumulate_grad_batches: 1
+  log_every_n_steps: 50
+  resume_from_checkpoint:
+  num_sanity_val_steps: 2
+  model_check_point:
+    monitor: val_acc
+    mode: max
+  precision: bf16-mixed
+
+optimizer:
+  type: torch.optim.AdamW
+  lr: 1.0e-4
+  weight_decay: 1.0e-2
+
+scheduler:
+  type: torch.optim.lr_scheduler.CosineAnnealingLR
+  T_max: *max_epochs
+  eta_min: 5.0e-6
+
+train_parameters:
+  batch_size: 128
+
+val_parameters:
+  batch_size: 128
+
+augmentation:
+  image_size: 196
+
+output_root_dir: experiments

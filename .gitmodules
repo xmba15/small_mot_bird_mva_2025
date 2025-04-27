@@ -1,0 +1,6 @@
+[submodule "externals/boxmot"]
+	path = externals/boxmot
+	url = https://github.com/mikel-brostrom/boxmot.git
+[submodule "externals/MVA2025-SMOT4SB"]
+	path = externals/MVA2025-SMOT4SB
+	url = https://github.com/IIM-TTIJ/MVA2025-SMOT4SB.git
