@@ -1,6 +1,6 @@
 #!/bin/bash
 
-dir_list=( $(seq -w 0003 0038) )
+dir_list=( $(seq -w 0001 0038) )
 
 for _dir in "${dir_list[@]}"; do
     echo "Run video ${_dir}"
