@@ -16,4 +16,3 @@ albumentations==2.0.5
 timm==v1.0.15
 kornia==0.8.0
 boxmot==12.0.7
-ptlflow

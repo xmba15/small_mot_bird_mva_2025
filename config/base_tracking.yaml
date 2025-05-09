@@ -17,10 +17,6 @@ classifier:
   checkpoint: ./checkpoints/model_weights/bird_classification_mambaout.pth
   conf_thr: 0.5
 
-optical_flow:
-  model_name: "dip"
-  ckpt_path: "things"
-
 tracker:
   tracker_type: ocsort
   tracker_config_path: ./config/boxmot/ocsort.yaml
