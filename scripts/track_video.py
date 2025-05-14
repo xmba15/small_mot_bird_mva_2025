@@ -145,6 +145,7 @@ def main():
     )
 
     track_results = []
+    prev_transform_matrix = np.eye(3, 3, dtype=np.float32)
     for idx, frame_path in enumerate(tqdm.tqdm(video_info.frame_paths)):
         detections = ensembler.inference(
             frame_path,
@@ -166,7 +167,13 @@ def main():
                 prev_frame,
                 frame,
             )
-            transform_matrix = kpt_transform_group.transform_matrix
+
+            if kpt_transform_group.transform_matrix is not None:
+                transform_matrix = kpt_transform_group.transform_matrix.copy()
+            else:
+                transform_matrix = prev_transform_matrix.copy()
+
+            prev_transform_matrix = transform_matrix.copy()
             transform_matrix = transform_matrix[:2, :]
 
             for tk_idx, active_track in enumerate(tracker.active_tracks):
@@ -174,7 +181,7 @@ def main():
                 conf = active_track.conf
                 transformed_bbox_xyxy = transform_bbox_xyxy(
                     bbox_xyxy,
-                    kpt_transform_group.transform_matrix,
+                    transform_matrix,
                     conf,
                 )
                 m = transform_matrix[:, :2]
